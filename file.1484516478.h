@@ -32,7 +32,8 @@ namespace files{
 			friend ostream & operator<<(ostream & of, const filemedia &);
 			friend istream & operator>>(istream & in, filemedia &);
 			
-		
+			//definire la funzione memorizza_dati che scrive su file di testo 
+			//e la funzione salva che scrive su file binario
 	};
 	
 	
