@@ -3,25 +3,31 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
-#include "brano.h"
-#include "video.h"
+#include "file.h"
 
 using namespace std;
 using namespace files;
 
-typedef file T;
+typedef filemedia T;
+
+//la coda è una coda di puntatori a classe base per utilizzare il polimorfismo
+
+//implementazione con vettore
 
 class coda{
-	private:
-		T* testa;
-		int sz;
+	static const int dim = 50;
+	T file[dim];
+	int count;
 	public:
-		coda();
-		
+		explicit coda();
+		bool append(const T &);
+		bool pop(T &);
+		bool empty()const{return count==0;}
+		bool full()const{return count==dim-1;}
+		void save_bin(const char* filename)const;
+		void save_txt(const char* filename)const;
 };
-	
-	
+
 
 
 #endif //CODA_H
-
