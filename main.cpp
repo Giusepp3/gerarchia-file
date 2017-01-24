@@ -1,19 +1,22 @@
 #include <iostream>
 #include "file.h"
-#include "brano.h"
-#include "video.h"
 #include <fstream>
 #include <cstring>
-
+#include "musica.h"
 
 using namespace std;
 
 using namespace files;
 
 
-
-/* run this program using the console pauser or add your own getch, system("pause") or input loop */
-
 int main(int argc, char** argv) {
+	
+	branomusic b("www.spotify.com/songn1341",414,".mp3","ed-sheeran","ed-sheeran",3.4);
+	
+	b.save_bin("brano.bin");
+
+	
+	
+	
 	return 0;
 }

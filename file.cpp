@@ -1,22 +1,23 @@
 #include "file.h"
 
-namespace files{
+using namespace std;
 
+namespace files{
 	
 	filemedia::filemedia(){
 		url = new char[1];
 		strcpy(url,"");
-		kbyte = 0;
-		formato = new char[1];
+		kbyte=0;
+		formato=new char[1];
 		strcpy(formato,"");
 		
 	}
 	
-	filemedia::filemedia(const char* add, const int dim, const char* ext){
-		url = new char[strlen(add)+1];
-		strcpy(url,add);
-		kbyte = dim;
-		formato = new char[strlen(ext)+1];
+	filemedia::filemedia(const char* web, const int dim, const char* ext){
+		url = new char[strlen(web)+1];
+		strcpy(url,web);
+		kbyte=dim;
+		formato=new char[strlen(ext)+1];
 		strcpy(formato,ext);
 		
 	}
@@ -24,70 +25,9 @@ namespace files{
 	filemedia::filemedia(const filemedia & f){
 		url = new char[strlen(f.url)+1];
 		strcpy(url,f.url);
-		kbyte = f.kbyte;
-		formato = new char[strlen(f.formato)+1];
+		kbyte=f.kbyte;
+		formato=new char[strlen(f.formato)+1];
 		strcpy(formato,f.formato);
-		
-	}
-	
-	filemedia filemedia::operator=(const filemedia & f){
-		if(this==&f) return *this;
-		if(url) delete[] url;
-		set_url(f.get_url());
-		kbyte = f.get_kbyte();
-		if(formato) delete[] formato;
-		set_formato(f.get_formato());
-		
-		return *this;
-		
-	} 
-	
-	void filemedia::set_url(const char* add){
-		if(url) delete [] url;
-		url = new char [strlen(add)+1];
-		strcpy(url,add);
-		
-	}
-	
-	void filemedia::set_kbyte(const int dim){
-		kbyte = dim;
-		
-	}
-	
-	void filemedia::set_formato(const char* form){
-		if(formato) delete [] formato;
-		formato = new char [strlen(form)+1];
-		strcpy(formato,form);
-		
-	}
-	
-	void filemedia::print(ostream & of)const{
-		of << url << ' ' << kbyte << ' ' << formato << ' ';
-		
-	}
-	
-	ostream & operator<<(ostream & of, const filemedia & f){
-		f.print(of);
-		return of;
-		
-	}
-	
-	void filemedia::read(istream & in){
-		char buffer[800];
-		int dim;
-		in.getline(buffer,799);
-		set_url(buffer);
-		in >> dim;
-		set_kbyte(dim);
-		in.ignore();
-		in.getline(buffer,799);
-		set_formato(buffer);
-		
-	}
-	
-	istream & operator>>(istream & in, filemedia & f){
-		f.read(in);
-		return in;
 		
 	}
 	
@@ -96,6 +36,107 @@ namespace files{
 		delete [] formato;
 	}
 	
+	const filemedia& filemedia::operator=(const filemedia& f){
+		if(this==&f) return *this;
+		set_url(f.url);
+		set_kbyte(f.kbyte);
+		set_form(f.formato);
+		return *this;
+	}
+	
+	void filemedia::set_url(const char* url){
+		if(this->url) delete [] this->url;
+		this->url=new char[strlen(url)+1];
+		strcpy(this->url,url);
+		
+	}
+	
+	void filemedia::set_kbyte(const int kbyte){
+		this->kbyte=kbyte;
+	}
+	
+	void filemedia::set_form(const char* form){
+		if(this->formato) delete [] this->formato;
+		this->formato=new char [strlen(form)+1];
+		strcpy(this->formato,form);
+	}
+	
+	
+	void filemedia::serialize(ofstream & of)const{
+		int len1,len2;
+		len1=strlen(url);
+		of.write((char*)&len1,sizeof(len1));
+		of.write(url,len1);
+		len2=strlen(formato);
+		of.write((char*)&kbyte,sizeof(kbyte));
+		of.write((char*)&len2,sizeof(len2));
+		of.write(formato,len2);
+	}
+	
+	void filemedia::deserialize(ifstream & in){
+		int len1,len2;
+		char* buffer;
+		in.read((char*)&len1,sizeof(len1));
+		buffer=new char[len1+1];
+		in.read(buffer,len1);
+		buffer[len1]='\0';
+		set_url(buffer);
+		in.read((char*)&kbyte,sizeof(kbyte));
+		in.read((char*)&len2,sizeof(len2));
+		delete [] buffer;
+		buffer = new char[len2+1];
+		in.read(buffer,len2);
+		buffer[len2]= '\0';
+		set_form(buffer);
+	}
+	
+	void filemedia::save_bin(const char* filename)const{
+		ofstream of;
+		of.open(filename,ios::binary);
+		if(of.fail()) cout << "errore file\n";
+		this->serialize(of);
+		of.close();
+		
+	}
+	
+	
+	void filemedia::print(ostream & os)const{
+		os << url << ' ' << kbyte << ' ' << formato <<' ';
+	}
+	
+	ostream & operator<<(ostream & os, const filemedia & f){
+		f.print(os);
+		return os;
+	}
+	
+	void filemedia::read(istream & in){
+		char buffer[800];
+		int buf;
+		in.getline(buffer,799);
+		set_url(buffer);
+		in >> buf;
+		set_kbyte(buf);
+		in.ignore();
+		in.getline(buffer,799);
+		set_form(buffer);
+	}
+	
+	istream & operator>>(istream & in, filemedia &f ){
+		f.read(in);
+		return in;
+	}
+
+	void filemedia::save_txt(const char* filename)const{
+		ofstream of(filename);
+		if(of.fail()) cout << "errore file\n";
+		savefile(of);
+		of.close();
+		 
+	}	
+	
+	void filemedia::savefile(ofstream & of)const{
+		of << strlen(url) << ' '<< url << ' ' << kbyte << ' ' << strlen(formato) << ' ' << formato << ' ';
+	}
 	
 	
 	
@@ -104,5 +145,4 @@ namespace files{
 	
 	
 	
-	
-} //files
+}
